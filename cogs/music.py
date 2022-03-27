@@ -1,9 +1,12 @@
 import discord
 from discord.ext import commands
 
-# Defenitionen
-import settings
+from dotenv import load_dotenv
+import os
 
+from utils.design_helper import ConsoleColors
+
+load_dotenv()
 
 class MyMusic(commands.Cog):
     def __init__(self, client):
@@ -29,13 +32,12 @@ class MyMusic(commands.Cog):
             {"host": "lavalink.cobaltonline.net", "port": 443, "password": "cobaltlavanode23@", "https": True},
         
         ]
-        print(f"{settings.console_colors.BLUE}Loaded music{settings.console_colors.RESET}")
         self.client.spotify_credentials = {
-            'client_id': settings.SPOTIFY_ID,
-            'client_secret': settings.SPOTIFY_SECRET
+            'client_id': os.getenv("SPOTIFY_ID"),
+            'client_secret': os.getenv("SPOTIFY_SECRET")
         }
 
-
+        print(f"{ConsoleColors.GREEN} Loaded Music")
 def setup(client):
     client.add_cog(MyMusic(client))
     client.load_extension("dismusic")

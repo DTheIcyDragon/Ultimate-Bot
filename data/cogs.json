@@ -1,3 +1,5 @@
 {
-
+    "cogs": {
+        "discord_events": "1"
+    }
 }

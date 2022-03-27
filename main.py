@@ -66,28 +66,25 @@ class LoadSelect(discord.ui.Select):
             max_values=1,
             options=options_(),
         )
-    
+
     async def callback(self, interaction: discord.Interaction):
-        client.load_extension(f"cogs.{self.values[0].lower()}")
-        
-        with open("bot_data/data/loads.json", "r") as f:
-            loads = json.load(f)
-        
-        loads["cogs"][self.values[0].lower()] = "1"
-        
-        with open("bot_data/data/loads.json", "w") as f:
-            json.dump(loads, f, indent=4)
-        
-        await interaction.response.send_message(
-            f"Loaded {self.values[0]}",
-            ephemeral=True,
-            delete_after=5
-        )
-class LoadView(discord.ui.View):
-    def __init__(self):
-        super().__init__()
-        # Adds the dropdown to our view object.
-        self.add_item(LoadSelect())
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message(f"{interaction.user.mention} you are not allowed to do that")
+        else:
+            client.load_extension(f"cogs.{self.values[0].lower()}")
+
+            with open("data/cogs.json", "r") as f:
+                loads = json.load(f)
+
+            loads["cogs"][self.values[0].lower()] = "1"
+
+            with open("data/cogs.json", "w") as f:
+                json.dump(loads, f, indent=4)
+            
+            await interaction.response.send_message(
+                f"Loaded {self.values[0]}",
+                delete_after=5
+            )
 class UnLoadSelect(discord.ui.Select):
     def __init__(self):
         options = options_()
@@ -100,25 +97,23 @@ class UnLoadSelect(discord.ui.Select):
         )
     
     async def callback(self, interaction: discord.Interaction):
-        client.unload_extension(f"cogs.{self.values[0].lower()}")
-        
-        with open("bot_data/data/loads.json", "r") as f:
-            loads = json.load(f)
-        
-        loads["cogs"][self.values[0].lower()] = "0"
-        
-        with open("bot_data/data/loads.json", "w") as f:
-            json.dump(loads, f, indent=4)
-        
-        await interaction.response.send_message(
-            f"Unloaded {self.values[0]}",
-            ephemeral=True,
-            delete_after=5
-        )
-class UnLoadView(discord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.add_item(UnLoadSelect())
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message(f"{interaction.user.mention} you are not allowed to do that")
+        else:
+            client.unload_extension(f"cogs.{self.values[0].lower()}")
+            
+            with open("data/cogs.json", "r") as f:
+                loads = json.load(f)
+            
+            loads["cogs"][self.values[0].lower()] = "0"
+            
+            with open("data/cogs.json", "w") as f:
+                json.dump(loads, f, indent=4)
+            
+            await interaction.response.send_message(
+                f"Unloaded {self.values[0]}",
+                delete_after = 5
+            )
 class ReLoadSelect(discord.ui.Select):
     def __init__(self):
         options = options_()
@@ -131,17 +126,22 @@ class ReLoadSelect(discord.ui.Select):
         )
     
     async def callback(self, interaction: discord.Interaction):
-        client.unload_extension(f"cogs.{self.values[0].lower()}")
-        client.load_extension(f"cogs.{self.values[0].lower()}")
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message(f"{interaction.user.mention} you are not allowed to do that")
+            return
+        else:
+            client.unload_extension(f"cogs.{self.values[0].lower()}")
+            client.load_extension(f"cogs.{self.values[0].lower()}")
         
         await interaction.response.send_message(
             f"Reloaded {self.values[0]}",
-            ephemeral=True,
             delete_after=5
         )
-class ReLoadView(discord.ui.View):
+class UniLoadView(discord.ui.View):
     def __init__(self):
         super().__init__()
+        self.add_item(LoadSelect())
+        self.add_item(UnLoadSelect())
         self.add_item(ReLoadSelect())
 
 #definitions
@@ -182,7 +182,19 @@ Joined at the following guilds
     for key, value in loads.items():
         if value == "1":
             client.load_extension(f"cogs.{key}")
-            print(f"{ConsoleColors.GREEN}Loaded {key}{ConsoleColors.NORMAL}")
+
+@client.command(name = "cogs", help = "Shows wich Cogs are loaded")
+async def cogs_cmd(ctx):
+    with open("data/cogs.json", "r") as f:
+        loads = json.load(f)
+    loads = loads["cogs"]
+    embed = discord.Embed(title = "Cog Board",
+                          description = "Shows wich Modules are loaded",
+                          color = discord.Color.dark_red())
+    for key, value in loads.items():
+        embed.add_field(name = key.capitalize(), value = f'{"🟢" if value == "1" else "🔴"}')
+    await ctx.reply(embed = embed, view = UniLoadView())
+    
 
 @client.command(name = "test", help = "A command to test the bots functionality")
 async def test(ctx):
