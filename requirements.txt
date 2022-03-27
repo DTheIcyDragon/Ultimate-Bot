@@ -1,3 +1,4 @@
 py-cord == 2.0.0b5
-pyfiglet
+pyfiglet==0.8.post1
 dismusic
+python-dotenv==0.20.0

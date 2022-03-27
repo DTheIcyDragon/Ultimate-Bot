@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import utils
@@ -84,15 +83,11 @@ class LoadSelect(discord.ui.Select):
             ephemeral=True,
             delete_after=5
         )
-
-
 class LoadView(discord.ui.View):
     def __init__(self):
         super().__init__()
         # Adds the dropdown to our view object.
         self.add_item(LoadSelect())
-
-
 class UnLoadSelect(discord.ui.Select):
     def __init__(self):
         options = options_()
@@ -120,14 +115,10 @@ class UnLoadSelect(discord.ui.Select):
             ephemeral=True,
             delete_after=5
         )
-
-
 class UnLoadView(discord.ui.View):
     def __init__(self):
         super().__init__()
         self.add_item(UnLoadSelect())
-
-
 class ReLoadSelect(discord.ui.Select):
     def __init__(self):
         options = options_()
@@ -148,18 +139,24 @@ class ReLoadSelect(discord.ui.Select):
             ephemeral=True,
             delete_after=5
         )
-
-
 class ReLoadView(discord.ui.View):
     def __init__(self):
         super().__init__()
         self.add_item(ReLoadSelect())
+
 #definitions
 def get_prefix(client, message):
     with open("data/prefixes.json", "r") as f:
         prefixes = json.load(f)
     return prefixes[str(message.guild.id)]
-
+def options_():
+    modules = []
+    
+    for file in os.listdir("cogs"):
+        if file.endswith(".py"):
+            modules.append(discord.SelectOption(label=str(file.capitalize()[:-3])))
+    
+    return modules
 
 #main_bot
 client = commands.Bot(command_prefix=get_prefix,
