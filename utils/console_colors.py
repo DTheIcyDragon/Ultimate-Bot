@@ -1,9 +1,3 @@
-TOKEN = "NzYyNjI3Mzg0MzM4OTM5OTE1.X3r6GQ.bol40ITVuMT_6o1Sg_q6FeCURMs"
-SPOTIFY_ID = "7ff20acde3574872a44b261479509cff"
-SPOTIFY_SECRET = "73858726b2a448adaf5ceb3ac44f5db1"
-# roles
-
-# ignore
 class console_colors:
     PURPLE = '\033[95m'  # purple
     BLUE = '\033[94m'  # blue
