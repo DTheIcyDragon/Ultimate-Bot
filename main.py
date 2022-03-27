@@ -1,12 +1,15 @@
-import discord
-from discord.ext import commands, tasks
-
-import utils.design_helper
-from utils import *
-
-import os
+import asyncio
 import json
+import os
+import utils
+
+import discord
+import pyfiglet
+from discord.ext import commands
 from dotenv import load_dotenv
+
+from utils.design_helper import *
+
 load_dotenv()
 
 
@@ -54,6 +57,103 @@ class SupremeHelpCommand(commands.HelpCommand):
     async def send_cog_help(self, cog):
         title = cog.qualified_name or "No"
         await self.send_help_embed(f'{title} Category', cog.description, cog.get_commands())
+
+
+class LoadSelect(discord.ui.Select):
+    def __init__(self):
+        super().__init__(
+            placeholder="Choose the cog to load",
+            min_values=1,
+            max_values=1,
+            options=options_(),
+        )
+    
+    async def callback(self, interaction: discord.Interaction):
+        client.load_extension(f"cogs.{self.values[0].lower()}")
+        
+        with open("bot_data/data/loads.json", "r") as f:
+            loads = json.load(f)
+        
+        loads["cogs"][self.values[0].lower()] = "1"
+        
+        with open("bot_data/data/loads.json", "w") as f:
+            json.dump(loads, f, indent=4)
+        
+        await interaction.response.send_message(
+            f"Loaded {self.values[0]}",
+            ephemeral=True,
+            delete_after=5
+        )
+
+
+class LoadView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        # Adds the dropdown to our view object.
+        self.add_item(LoadSelect())
+
+
+class UnLoadSelect(discord.ui.Select):
+    def __init__(self):
+        options = options_()
+        
+        super().__init__(
+            placeholder="Choose the cog to unload",
+            min_values=1,
+            max_values=1,
+            options=options,
+        )
+    
+    async def callback(self, interaction: discord.Interaction):
+        client.unload_extension(f"cogs.{self.values[0].lower()}")
+        
+        with open("bot_data/data/loads.json", "r") as f:
+            loads = json.load(f)
+        
+        loads["cogs"][self.values[0].lower()] = "0"
+        
+        with open("bot_data/data/loads.json", "w") as f:
+            json.dump(loads, f, indent=4)
+        
+        await interaction.response.send_message(
+            f"Unloaded {self.values[0]}",
+            ephemeral=True,
+            delete_after=5
+        )
+
+
+class UnLoadView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(UnLoadSelect())
+
+
+class ReLoadSelect(discord.ui.Select):
+    def __init__(self):
+        options = options_()
+        
+        super().__init__(
+            placeholder="Choose the cog to Reload",
+            min_values=1,
+            max_values=1,
+            options=options,
+        )
+    
+    async def callback(self, interaction: discord.Interaction):
+        client.unload_extension(f"cogs.{self.values[0].lower()}")
+        client.load_extension(f"cogs.{self.values[0].lower()}")
+        
+        await interaction.response.send_message(
+            f"Reloaded {self.values[0]}",
+            ephemeral=True,
+            delete_after=5
+        )
+
+
+class ReLoadView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(ReLoadSelect())
 #definitions
 def get_prefix(client, message):
     with open("data/prefixes.json", "r") as f:
@@ -68,9 +168,24 @@ client = commands.Bot(command_prefix=get_prefix,
                       help_command=SupremeHelpCommand(),
                       intents = discord.Intents.all())
 
+@client.event
+async def on_ready():
+    print(f"""
+{ConsoleColors.PURPLE}
+{pyfiglet.figlet_format(client.user.name)}
+Bot ID: {client.user.id}
+Joined at the following guilds
+""")
+    async for guild in client.fetch_guilds(limit=100):
+        print(ConsoleColors.BLUE, guild.name)
 
-
-
+    with open("data/cogs.json", "r") as f:
+        loads = json.load(f)
+    loads = loads["cogs"]
+    for key, value in loads.items():
+        if value == "1":
+            client.load_extension(f"cogs.{key}")
+            print(f"{ConsoleColors.GREEN}Loaded {key}{ConsoleColors.NORMAL}")
 
 @client.command(name = "test", help = "A command to test the bots functionality")
 async def test(ctx):
