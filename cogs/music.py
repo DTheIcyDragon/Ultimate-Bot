@@ -4,8 +4,6 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 
-from utils.design_helper import ConsoleColors
-
 load_dotenv()
 
 class MyMusic(commands.Cog):
@@ -37,7 +35,6 @@ class MyMusic(commands.Cog):
             'client_secret': os.getenv("SPOTIFY_SECRET")
         }
 
-        print(f"{ConsoleColors.GREEN} Loaded Music")
 def setup(client):
     client.add_cog(MyMusic(client))
     client.load_extension("dismusic")

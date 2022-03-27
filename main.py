@@ -182,7 +182,8 @@ Joined at the following guilds
     for key, value in loads.items():
         if value == "1":
             client.load_extension(f"cogs.{key}")
-
+            print(f"{ConsoleColors.GREEN}       Loaded {key}")
+            
 @client.command(name = "cogs", help = "Shows wich Cogs are loaded")
 async def cogs_cmd(ctx):
     with open("data/cogs.json", "r") as f:

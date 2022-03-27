@@ -1,6 +1,7 @@
 {
     "cogs": {
         "discord_events": "1",
-        "music": "0"
+        "music": "0",
+        "useful": "1"
     }
 }
