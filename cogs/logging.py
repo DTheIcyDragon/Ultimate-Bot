@@ -1,4 +1,4 @@
-import discord
+
 from discord.ext import commands
 from utils.design_helper import ConsoleColors
 import logging
@@ -22,19 +22,19 @@ class DiscordEvents(commands.Cog):
     async def on_resumed(self):
         logging.warning("The client has reconnected!")
         print(f"{ConsoleColors.YELLOW} Reconnected!")
-        
+
     @commands.Cog.listener()
     async def on_member_join(self, member):
         logging.info(f"{member.name}#{member.descriminator} joined the gang.")
-    
+
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         logging.info(f"{member.name}#{member.descriminator} left the gang.")
-        
+
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         logging.info(f"{self.client.user.name} joined {guild.name}.")
-        
+
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         logging.info(f"{self.client.user.name} left {guild.name}.")
