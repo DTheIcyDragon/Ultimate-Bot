@@ -104,6 +104,9 @@ celerybeat.pid
 # Environments
 .env
 .venv
+#dont want to leak anything
+/data/cogs.json
+/data/prefixes.json
 env/
 venv/
 ENV/
@@ -127,3 +130,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#like I said nothing
+.idea
+.gitignore
