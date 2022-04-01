@@ -80,7 +80,7 @@ class LoadSelect(discord.ui.Select):
 
             with open("data/cogs.json", "w") as f:
                 json.dump(loads, f, indent=4)
-            
+
             await interaction.response.send_message(
                 f"Loaded {self.values[0]}",
                 delete_after=5
@@ -88,28 +88,28 @@ class LoadSelect(discord.ui.Select):
 class UnLoadSelect(discord.ui.Select):
     def __init__(self):
         options = options_()
-        
+
         super().__init__(
             placeholder="Choose the cog to unload",
             min_values=1,
             max_values=1,
             options=options,
         )
-    
+
     async def callback(self, interaction: discord.Interaction):
         if not interaction.user.guild_permissions.administrator:
             await interaction.response.send_message(f"{interaction.user.mention} you are not allowed to do that")
         else:
             client.unload_extension(f"cogs.{self.values[0].lower()}")
-            
+
             with open("data/cogs.json", "r") as f:
                 loads = json.load(f)
-            
+
             loads["cogs"][self.values[0].lower()] = "0"
-            
+
             with open("data/cogs.json", "w") as f:
                 json.dump(loads, f, indent=4)
-            
+
             await interaction.response.send_message(
                 f"Unloaded {self.values[0]}",
                 delete_after = 5
@@ -117,14 +117,14 @@ class UnLoadSelect(discord.ui.Select):
 class ReLoadSelect(discord.ui.Select):
     def __init__(self):
         options = options_()
-        
+
         super().__init__(
             placeholder="Choose the cog to Reload",
             min_values=1,
             max_values=1,
             options=options,
         )
-    
+
     async def callback(self, interaction: discord.Interaction):
         if not interaction.user.guild_permissions.administrator:
             await interaction.response.send_message(f"{interaction.user.mention} you are not allowed to do that")
@@ -132,7 +132,7 @@ class ReLoadSelect(discord.ui.Select):
         else:
             client.unload_extension(f"cogs.{self.values[0].lower()}")
             client.load_extension(f"cogs.{self.values[0].lower()}")
-        
+
         await interaction.response.send_message(
             f"Reloaded {self.values[0]}",
             delete_after=5
@@ -151,11 +151,11 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 def options_():
     modules = []
-    
+
     for file in os.listdir("cogs"):
         if file.endswith(".py"):
             modules.append(discord.SelectOption(label=str(file.capitalize()[:-3])))
-    
+
     return modules
 
 #main_bot
@@ -183,7 +183,7 @@ Joined at the following guilds
         if value == "1":
             client.load_extension(f"cogs.{key}")
             print(f"{ConsoleColors.GREEN}       Loaded {key}")
-            
+
 @client.command(name = "cogs", help = "Shows wich Cogs are loaded")
 async def cogs_cmd(ctx):
     with open("data/cogs.json", "r") as f:
@@ -195,7 +195,7 @@ async def cogs_cmd(ctx):
     for key, value in loads.items():
         embed.add_field(name = key.capitalize(), value = f'{"🟢" if value == "1" else "🔴"}')
     await ctx.reply(embed = embed, view = UniLoadView())
-    
+
 
 @client.command(name = "test", help = "A command to test the bots functionality")
 async def test(ctx):

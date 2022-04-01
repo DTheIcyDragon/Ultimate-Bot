@@ -1,6 +1,7 @@
 {
     "cogs": {
         "music": "0",
-        "useful": "1"
+        "useful": "1",
+        "logging": "1"
     }
 }
