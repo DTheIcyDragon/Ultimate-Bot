@@ -7,11 +7,12 @@ import logging
 with open("data/bot.log", "w") as log:
     log.write("")
 
+logging.getLogger("discord").setLevel(logging.CRITICAL) #Implemented this to prevent py-cord logging module from logging (Credits to Red#6291 from the py-cord discord
 logging.basicConfig(filename="data/bot.log",
             filemode="a",
             datefmt="%d-%b-%y %H:%M:%S",
             format="%(levelname)s: %(asctime)s - %(message)s",
-            level="WARNING")                                        #Changed this to prevent py-cord logging module from logging
+            level="INFO")
 
 class DiscordEvents(commands.Cog):
     def __init__(self, client):
@@ -20,17 +21,17 @@ class DiscordEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         logging.warning(f"The client is ready!")
-        print(f"{ConsoleColors.GREEN} Started at {datetime.datetime.strftime('%d-%b-%y %H:%M:%S')}!")
+        print(f"{ConsoleColors.GREEN} Started at {datetime.date} {datetime.time}!")
 
     @commands.Cog.listener()
     async def on_disconnect(self):
         logging.critical(f"The client has been disconnected!")
-        print(f"{ConsoleColors.RED} Disconnected! at {datetime.datetime.strftime('%d-%b-%y %H:%M:%S')}!")
+        print(f"{ConsoleColors.RED} Disconnected! at {datetime.date} {datetime.time}!")
 
     @commands.Cog.listener()
     async def on_resumed(self):
         logging.warning("The client has reconnected!")
-        print(f"{ConsoleColors.YELLOW} Reconnected! at {datetime.datetime.strftime('%d-%b-%y %H:%M:%S')}!")
+        print(f"{ConsoleColors.YELLOW} Reconnected! at {datetime.date} {datetime.time}!")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):

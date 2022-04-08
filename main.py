@@ -1,5 +1,7 @@
 import json
 import os
+import platform
+
 import utils
 
 import discord
@@ -148,6 +150,8 @@ class UniLoadView(discord.ui.View):
 def get_prefix(client, message):
     with open("data/prefixes.json", "r") as f:
         prefixes = json.load(f)
+        if isinstance(message.channel, discord.DMChannel):
+            return "isnotaPrefixedChannel"
     return prefixes[str(message.guild.id)]
 def options_():
     modules = []
@@ -170,7 +174,10 @@ async def on_ready():
     print(f"""
 {ConsoleColors.PURPLE}
 {pyfiglet.figlet_format(client.user.name)}
-Bot ID: {client.user.id}
+Logged in as {client.user.name} ({client.user.id})
+Pycord Version {discord.__version__}
+Python Version {platform.python_version()}
+Running on: {platform.system()} {platform.release()} ({os.name})
 Joined at the following guilds
 """)
     async for guild in client.fetch_guilds(limit=100):
@@ -184,7 +191,7 @@ Joined at the following guilds
             client.load_extension(f"cogs.{key}")
             print(f"{ConsoleColors.GREEN}       Loaded {key}")
 
-@client.command(name = "cogs", help = "Shows wich Cogs are loaded")
+@client.command(name = "cogs", help = "Shows wich Cogs are loaded\nLoad, Unload, Reload") #permissions are defined in the view
 async def cogs_cmd(ctx):
     with open("data/cogs.json", "r") as f:
         loads = json.load(f)
@@ -198,6 +205,7 @@ async def cogs_cmd(ctx):
 
 
 @client.command(name = "test", help = "A command to test the bots functionality")
+@commands.is_owner()
 async def test(ctx):
     await ctx.reply(embed = utils.design_helper.TestEmbed())
 
