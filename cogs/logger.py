@@ -20,34 +20,26 @@ class DiscordEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        logging.warning(f"The client is ready!")
-        print(f"{ConsoleColors.GREEN} Started at {datetime.date} {datetime.time}!")
+        logging.info(f"The client is ready!")
+        print(f"{ConsoleColors.GREEN} Started at {datetime.datetime.now()}!")
 
     @commands.Cog.listener()
     async def on_disconnect(self):
         logging.critical(f"The client has been disconnected!")
-        print(f"{ConsoleColors.RED} Disconnected! at {datetime.date} {datetime.time}!")
+        print(f"{ConsoleColors.RED} Disconnected! at {datetime.datetime.now()}!")
 
     @commands.Cog.listener()
     async def on_resumed(self):
         logging.warning("The client has reconnected!")
-        print(f"{ConsoleColors.YELLOW} Reconnected! at {datetime.date} {datetime.time}!")
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        logging.warning(f"{member.name}#{member.descriminator} joined the gang.")
-
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        logging.warning(f"{member.name}#{member.descriminator} left the gang.")
+        print(f"{ConsoleColors.YELLOW} Reconnected! at {datetime.datetime.now()}!")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
-        logging.warning(f"{self.client.user.name} joined {guild.name}.")
+        logging.info(f"{self.client.user.name} joined {guild.name}.")
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        logging.warning(f"{self.client.user.name} left {guild.name}.")
+        logging.info(f"{self.client.user.name} left {guild.name}.")
 
 def setup(client):
     client.add_cog(DiscordEvents(client))
