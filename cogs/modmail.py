@@ -17,6 +17,8 @@ class ModMail(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, msg):
         if isinstance(msg.channel, discord.DMChannel):
+            if msg.author == discord.User.bot:
+                return
             if msg.author.id != self.client.user.id:
                 parent_channel = int(os.getenv("MODMAILCHANNEL"))
                 channel = self.client.get_channel(parent_channel)
@@ -115,11 +117,11 @@ class ModMail(commands.Cog):
                     await thread.send(embeds = [em, dm])
 
                     if len(msg.attachments) > 0:
-                        for attachment in msg.attachments:
-                            picture_em = discord.Embed(color=discord.Color.yellow())
-                            picture_em.set_author(name=msg.author, icon_url=msg.author.display_avatar)
-                            picture_em.set_image(url=attachment.url)
-                            await thread.send(embed=picture_em)
+                        picture_em = discord.Embed(description=msg.content, color=discord.Color.brand_green())
+                        picture_em.set_author(name=msg.author, icon_url=msg.author.display_avatar)
+                        picture_em.set_footer(text=f"Unique ID for this user {msg.author.id}")
+                        await msg.channel.send(content="The moderator is recieving the files", embed=picture_em)
+                        await member.send(embed=picture_em, files=[attachment for attachment in msg.attachments])
 
         if msg.channel.type == discord.ChannelType.public_thread:
             if msg.author.id != self.client.user.id:
@@ -136,13 +138,11 @@ class ModMail(commands.Cog):
                     await member.send(embed=em)
 
                 if len(msg.attachments) > 0:
-                    for attachment in msg.attachments:
-                        picture_em = discord.Embed(description=msg.content, color=discord.Color.brand_green())
-                        picture_em.set_author(name=msg.author, icon_url=msg.author.display_avatar)
-                        picture_em.set_image(url=attachment.url)
-                        picture_em.set_footer(text=f"Unique ID for this user {msg.author.id}")
-                        await msg.channel.send(embed=picture_em)
-                        await member.send(embed=picture_em)
+                    picture_em = discord.Embed(description=msg.content, color=discord.Color.brand_green())
+                    picture_em.set_author(name=msg.author, icon_url=msg.author.display_avatar)
+                    picture_em.set_footer(text=f"Unique ID for this user {msg.author.id}")
+                    await msg.channel.send(content="The user is recieving the files", embed=picture_em)
+                    await member.send(embed=picture_em, files = [attachment for attachment in msg.attachments])
 
 def setup(client):
     client.add_cog(ModMail(client))

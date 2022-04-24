@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import platform
@@ -58,7 +59,6 @@ class SupremeHelpCommand(commands.HelpCommand):
     async def send_cog_help(self, cog):
         title = cog.qualified_name or "No"
         await self.send_help_embed(f'{title} Category', cog.description, cog.get_commands())
-
 
 class LoadSelect(discord.ui.Select):
     def __init__(self):
@@ -153,6 +153,7 @@ def get_prefix(client, message):
         if isinstance(message.channel, discord.DMChannel):
             return "isnotaPrefixedChannel"
     return prefixes[str(message.guild.id)]
+
 def options_():
     modules = []
 
@@ -162,12 +163,18 @@ def options_():
 
     return modules
 
+started = time.time()
+
+def starttime():
+    return int(started)
+
 #main_bot
 client = commands.Bot(command_prefix=get_prefix,
                       case_insensitive=True,
                       strip_after_prefix=True,
                       help_command=SupremeHelpCommand(),
-                      intents = discord.Intents.all())
+                      intents = discord.Intents.all(),
+                      debug_guilds = [int(os.getenv("DEBUGGUILD"))])
 
 @client.event
 async def on_ready():
@@ -178,6 +185,7 @@ Logged in as {client.user.name} ({client.user.id})
 Pycord Version {discord.__version__}
 Python Version {platform.python_version()}
 Running on: {platform.system()} {platform.release()} ({os.name})
+Ready at: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 Joined at the following guilds
 """)
     async for guild in client.fetch_guilds(limit=100):
@@ -207,7 +215,7 @@ async def cogs_cmd(ctx):
 @client.command(name = "test", help = "A command to test the bots functionality")
 @commands.is_owner()
 async def test(ctx):
-    await ctx.reply(embed = utils.design_helper.TestEmbed())
+    await ctx.reply(embeds = [utils.design_helper.TestEmbed()])
 
 if __name__ == '__main__':
     client.run(os.getenv('TOKEN'))
