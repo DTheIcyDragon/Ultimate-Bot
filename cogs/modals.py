@@ -41,7 +41,7 @@ class FeedbackModal(discord.ui.Modal):
             self.add_item(discord.ui.InputText(style=discord.InputTextStyle.long,
                                                label="Details",
                                                placeholder="e.g. How am I able to do that."))
-        else:
+        if title == "Other":
             self.add_item(discord.ui.InputText(style=discord.InputTextStyle.short,
                                                label="Other",
                                                placeholder="...",
@@ -52,11 +52,21 @@ class FeedbackModal(discord.ui.Modal):
 
     async def callback(self, interaction: discord.Interaction):
         client = interaction.client
-        em = discord.Embed(title = self.children[0],
-                           description=self.children[1],
-                           color = discord.Color.purple())
+        guild = interaction.guild
+        member = guild.get_member(interaction.user.id)
         channel = client.get_channel(int(os.getenv("MODABSTIMMUNGEN")))
-        await channel.send(embed = em)
+        
+        em = discord.Embed(title = self.children[0].value,
+                           description=self.children[1].value,
+                           color = discord.Color.purple())
+        em.set_author(name = member.name, icon_url = member.display_avatar)
+        em.set_footer(text = member.id)
+        message = await channel.send(embed = em)
+        await interaction.response.send_message(embed = discord.Embed(title=f"Thanks for submitting your feedback.",
+                                                color = discord.Color.purple()).set_footer(text="Your id was submitted for your identification to inform you about the process."))
+        await message.add_reaction("🟢")
+        await message.add_reaction("🟡")
+        await message.add_reaction("🔴")
 
 class ModalsCog(commands.Cog):
     def __init__(self, client):
@@ -68,9 +78,9 @@ class ModalsCog(commands.Cog):
                     "Help",
                     "Other"]
 
-    @commands.slash_command(name = "Feedback",
+    @commands.slash_command(name = "feedback",
                             description = "Share any feedback related to us.",
-                            guild_ids=[884435317057286214])
+                            guild_ids=[884435317057286214, 798302722431909888])
     async def feedback(self,
                        ctx: discord.ApplicationContext,
                        form: discord.Option(str,

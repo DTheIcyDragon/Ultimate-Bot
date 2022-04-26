@@ -1,8 +1,10 @@
 {
     "cogs": {
         "music": "0",
-        "useful": "1",
-        "logger": "1",
-        "modmail": "1"
+        "autopurge": "1",
+        "events": "1",
+        "modmail": "1",
+        "base utility": "1",
+        "modals": "1"
     }
 }

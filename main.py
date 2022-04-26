@@ -174,7 +174,8 @@ client = commands.Bot(command_prefix=get_prefix,
                       strip_after_prefix=True,
                       help_command=SupremeHelpCommand(),
                       intents = discord.Intents.all(),
-                      debug_guilds = [int(os.getenv("DEBUGGUILD"))])
+                      #debug_guilds = [int(os.getenv("DEBUGGUILD"))]
+                        )
 
 @client.event
 async def on_ready():
@@ -190,13 +191,12 @@ Joined at the following guilds
 """)
     async for guild in client.fetch_guilds(limit=100):
         print(ConsoleColors.BLUE, guild.name)
-
+        
     with open("data/cogs.json", "r") as f:
         loads = json.load(f)
     loads = loads["cogs"]
     for key, value in loads.items():
         if value == "1":
-            client.load_extension(f"cogs.{key}")
             print(f"{ConsoleColors.GREEN}       Loaded {key}")
 
 @client.command(name = "cogs", help = "Shows wich Cogs are loaded\nLoad, Unload, Reload") #permissions are defined in the view
@@ -218,4 +218,12 @@ async def test(ctx):
     await ctx.reply(embeds = [utils.design_helper.TestEmbed()])
 
 if __name__ == '__main__':
+    
+    with open("data/cogs.json", "r") as f:
+        loads = json.load(f)
+    loads = loads["cogs"]
+    for key, value in loads.items():
+        if value == "1":
+            client.load_extension(f"cogs.{key}")
+
     client.run(os.getenv('TOKEN'))
