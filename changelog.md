@@ -1,6 +1,4 @@
-## Version 0.1b14 -> 0.1b15
----
-### Changes
+### Docs? or smth
 ---
 - Cogs
   - Modmail
