@@ -1,21 +1,18 @@
-import datetime
-import json
 import os
+import time
+import json
+import datetime
 import platform
 
-import utils
+from utils.design_helper import *
 
 import discord
 import pyfiglet
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from utils.design_helper import *
-
 load_dotenv()
 
-
-#class
 class SupremeHelpCommand(commands.HelpCommand):
     def get_command_signature(self, command):   #full credits to the pycord guide https://github.com/Pycord-Development/guide
         return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
@@ -146,14 +143,12 @@ class UniLoadView(discord.ui.View):
         self.add_item(UnLoadSelect())
         self.add_item(ReLoadSelect())
 
-#definitions
 def get_prefix(client, message):
     with open("data/prefixes.json", "r") as f:
         prefixes = json.load(f)
         if isinstance(message.channel, discord.DMChannel):
             return "isnotaPrefixedChannel"
     return prefixes[str(message.guild.id)]
-
 def options_():
     modules = []
 
@@ -168,7 +163,6 @@ started = time.time()
 def starttime():
     return int(started)
 
-#main_bot
 client = commands.Bot(command_prefix=get_prefix,
                       case_insensitive=True,
                       strip_after_prefix=True,
@@ -215,7 +209,14 @@ async def cogs_cmd(ctx):
 @client.command(name = "test", help = "A command to test the bots functionality")
 @commands.is_owner()
 async def test(ctx):
-    await ctx.reply(embeds = [utils.design_helper.TestEmbed()])
+    test_embed = discord.Embed(title="~***Mark***~ ***_down_*** title",
+                               description="**This** *is* ***a*** ~Description~",
+                               color = discord.Color.from_rgb(255,255,255))
+    test_embed.set_author(name = "Das ist der Authorname", icon_url="https://cdn.discordapp.com/attachments/962327039053033472/962327055066861638/dragon.jpg")
+    test_embed.set_footer(text="Footer text", icon_url="https://cdn.discordapp.com/avatars/861323291716354058/c7404f54fee88933771c8192c0f329a5.png?size=4096")
+    test_embed.add_field(name="This is a field", value="with a value", inline=True)
+    test_embed.add_field(name = "Inline", value="does this", inline=True)
+    await ctx.reply(embeds = [test_embed])
 
 if __name__ == '__main__':
     

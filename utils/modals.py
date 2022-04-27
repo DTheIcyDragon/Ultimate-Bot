@@ -1,8 +1,5 @@
 import os
-
 import discord
-from discord.ext import commands
-
 
 class FeedbackModal(discord.ui.Modal):
     def __init__(self, *args, **kwargs) -> None:
@@ -68,27 +65,3 @@ class FeedbackModal(discord.ui.Modal):
         await message.add_reaction("🟡")
         await message.add_reaction("🔴")
 
-class ModalsCog(commands.Cog):
-    def __init__(self, client):
-        self.client = client
-
-    AUTOCOMPLETE = ["Application",
-                    "Bug",
-                    "Feature",
-                    "Help",
-                    "Other"]
-
-    @commands.slash_command(name = "feedback",
-                            description = "Share any feedback related to us.",
-                            guild_ids=[884435317057286214, 798302722431909888])
-    async def feedback(self,
-                       ctx: discord.ApplicationContext,
-                       form: discord.Option(str,
-                                            "Pick a kind of feedback.",
-                                            autocomplete=discord.utils.basic_autocomplete(AUTOCOMPLETE))):
-
-        await ctx.send_modal(FeedbackModal(title = form))
-
-
-def setup(client):
-    client.add_cog(ModalsCog(client))
