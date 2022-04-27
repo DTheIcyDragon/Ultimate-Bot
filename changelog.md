@@ -1,6 +1,4 @@
-## Version 0.1b14 -> 0.1b15
----
-### Changes
+### Docs? or smth
 ---
 - Cogs
   - Modmail
@@ -10,3 +8,6 @@
   - Logger
     - Removed member logging
     - Removed discord logger
+  - Modals
+    - Created The Feedback Modal + Slash Command for it.
+      - maybe refactoring it later to match the files name and to reduce confusion 
