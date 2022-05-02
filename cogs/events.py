@@ -5,7 +5,7 @@ import logging
 import discord
 from discord.ext import commands
 
-from utils.design_helper import ConsoleColors
+from utils.console_colors import ConsoleColors
 
 logging.getLogger("discord").setLevel(logging.CRITICAL) #Implemented this to prevent py-cord logging module from logging (Credits to Red#6291 from the py-cord discord
 logging.basicConfig(filename="data/bot.log",
@@ -32,10 +32,10 @@ class DiscordEvents(commands.Cog):
     async def on_guild_join(self, guild):
         logging.info(f"{self.client.user.name} joined {guild.name}.")
 
-        with open("bot_data/data/prefixes.json", "r") as f:
+        with open("data/prefixes.json", "r") as f:
             prefixes = json.load(f)
         prefixes[str(guild.id)] = "//"
-        with open("bot_data/data/prefixes.json", "w") as f:
+        with open("data/prefixes.json", "w") as f:
             json.dump(prefixes, f, indent=4)
         
     @commands.Cog.listener()

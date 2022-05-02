@@ -6,7 +6,7 @@ import discord
 import psutil as psutil
 from discord.ext import commands
 
-from utils.design_helper import ConsoleColors
+from utils.console_colors import ConsoleColors
 from main import starttime, get_prefix
 
 class BaseUtils(commands.Cog):

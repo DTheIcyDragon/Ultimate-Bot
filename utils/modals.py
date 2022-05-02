@@ -64,4 +64,3 @@ class FeedbackModal(discord.ui.Modal):
         await message.add_reaction("🟢")
         await message.add_reaction("🟡")
         await message.add_reaction("🔴")
-

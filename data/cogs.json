@@ -5,6 +5,7 @@
         "events": "1",
         "modmail": "1",
         "base utility": "1",
-        "guild utilities": "1"
+        "guild utilities": "1",
+        "moderation": "1"
     }
 }

@@ -19,8 +19,7 @@ class GuildUtilsCog(commands.Cog):
                     "Other"]
 
     @commands.slash_command(name = "feedback",
-                            description = "Share any feedback related to us.",
-                            guild_ids=[884435317057286214, 798302722431909888])
+                            description = "Share any feedback related to us.")
     async def feedback(self,
                        ctx: discord.ApplicationContext,
                        form: discord.Option(str,
@@ -33,6 +32,8 @@ class GuildUtilsCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        if payload.user_id == self.client.user.id:
+            return
         if payload.channel_id == int(os.getenv("MODABSTIMMUNGEN")):
             message = self.client.get_message(int(payload.message_id))
             print(message)

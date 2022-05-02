@@ -23,7 +23,8 @@ class Autopurge(commands.Cog):
                                         bulk=True,
                                         reason=f"Bulk purge in {channel.name}")
             em = discord.Embed(title = "Purge",
-                               description = f"I cleared {len(purge)} Messages")
+                               description = f"I cleared {len(purge)} Messages",
+                               color = discord.Color.darker_gray())
             await sleep(0.8)
             await channel.send(embed = em)
         else:
