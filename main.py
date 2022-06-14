@@ -4,12 +4,13 @@ import json
 import datetime
 import platform
 
+import utils.buttons
+from utils.buttons import *
 from utils.console_colors import *
 
 import discord
 import pyfiglet
 from discord.ext import commands
-from discord.commands import permissions
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -124,8 +125,11 @@ client = commands.Bot(command_prefix=get_prefix,
                       case_insensitive=True,
                       strip_after_prefix=True,
                       intents = discord.Intents.all(),
-                      debug_guilds = [int(os.getenv("DEBUGGUILD"))]
-                        )
+                      debug_guilds = [int(os.getenv("DEBUGGUILD"))],
+                      activity = discord.Activity(type = discord.ActivityType.playing,
+                                                  name = "Modmail"),
+                      state = discord.Status.online
+                      )
 
 @client.event
 async def on_ready():
@@ -148,6 +152,14 @@ Joined at the following guilds
     for key, value in loads.items():
         if value == "1":
             print(f"{ConsoleColors.GREEN}       Loaded {key}")
+            
+    #await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.playing,
+    #                                                                                     name="Modmail",
+    #                                                                                     state="Working",
+    #                                                                                     details="For help DM me",
+    #                                                                                     assets={
+    #                                                                                         "large_image": "briefcase"
+    #                                                                                     }))
 
 @client.slash_command(name = "cogs", description = "Shows wich Cogs are loaded\nLoad, Unload, Reload") #permissions are defined in the view
 async def cogs_cmd(ctx):
@@ -163,7 +175,7 @@ async def cogs_cmd(ctx):
 
 
 @client.slash_command(name = "test", description = "A command to test the bots functionality")
-@permissions.is_owner()
+@commands.has_role(int(os.getenv("OWNERROLE")))
 async def test(ctx):
     test_embed = discord.Embed(title="~~***Mark***~~ ***__down__*** title",
                                description="**This** *is* ***a*** ~~Description~~",
@@ -173,7 +185,7 @@ async def test(ctx):
     test_embed.add_field(name="This is a field", value="with a value", inline=True)
     test_embed.add_field(name = "Inline", value="does this", inline=True)
     await ctx.respond(embeds = [test_embed])
-
+    
 if __name__ == '__main__':
     
     with open("data/cogs.json", "r") as f:

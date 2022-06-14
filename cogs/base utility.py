@@ -14,44 +14,50 @@ class BaseUtils(commands.Cog):
         self.client = client
 
 
-    @commands.command(name = "Ping", help = "Show's the latency of the bot.")
-    async def ping(self, ctx):
+    @commands.slash_command(name = "ping", description = "Show's the latency of the bot.")
+    async def ping(self, ctx: discord.ApplicationContext):
         ping = self.client.latency * 1000
         em = discord.Embed(title="PONG 🏓",
-                           description=f"`My latency`: {round(ping)}ms",
+                           description=f"`Ping`: {round(ping)}ms",
                            color=discord.Color.nitro_pink())
-        await ctx.reply(embed = em)
+        await ctx.respond(embed = em)
 
-    @commands.command(name = "prefix", help = "Changes the prefix of the bot.")
-    async def prefix(self, ctx, prefix):
+    @commands.slash_command(name = "prefix", description = "Changes the prefix of the bot.")
+    async def prefix(self,
+                     ctx: discord.ApplicationContext,
+                     prefix: discord.Option(str,
+                                            description = "The new Prefix of the bot.")
+                     ):
+        
         with open("data/prefixes.json", "r") as f:
             prefixes = json.load(f)
         prefixes[str(ctx.guild.id)] = prefix
         with open("data/prefixes.json", "w") as f:
             json.dump(prefixes, f, indent=4)
-        await ctx.reply(embed=discord.Embed(title="Prefix",
-                                            description=f"My prefix is now `{prefix}`",
+        await ctx.respond(embed=discord.Embed(title="Prefix",
+                                            description=f"Mein Prefix ist jetzt `{prefix}`.",
                                             color=discord.Color.nitro_pink()))
 
-    @commands.command(name = "botstats", help = "Show stats about the bot")
-    async def botstats(self, ctx):
+    @commands.slash_command(name = "botstats",
+                            description = "Show stats about the bot")
+    async def botstats(self, ctx: discord.ApplicationContext):
         em = discord.Embed(title="Stats", color=discord.Color.nitro_pink())
-        em.add_field(name = "Bot info",
+        em.add_field(name = "Bot Info",
                      value=f"""
-                                Logged in as {self.client.user.mention}
+                                Eingeloggt als {self.client.user.mention}
                                 **Prefix:** {get_prefix(client = self.client, message = ctx)}
                             """,
                      inline=False)
-        em.add_field(name = f"Statistics",
+        em.add_field(name = f"Statistiken",
                      value=f"""
-                                **Latency**
+                                **Latenz**
                                 {round(self.client.latency * 1000)}ms
-                                **Uptime**
-                                Exact:<t:{starttime()}:f>
-                                Relative: <t:{starttime()}:R>
+                                **Laufzeit**
+                                Exakt:<t:{starttime()}:f>
+                                Relativ: <t:{starttime()}:R>
                             """,
                      inline=False)
-        em.add_field(name="Other",
+        em.add_field(name="Anderes",
                      value=f"""
                                 Pycord Version: {discord.__version__}
                                 Python Version: {platform.python_version()}
@@ -60,12 +66,12 @@ class BaseUtils(commands.Cog):
                      inline=False)
         em.add_field(name = "Hardware",
                     value = f"""
-                                CPU Usage: {psutil.cpu_percent()}%
-                                RAM Usage: {psutil.virtual_memory()[2]}
+                                CPU Nutzung: {psutil.cpu_percent()}%
+                                RAM Nutzung: {psutil.virtual_memory()[2]}
                             """,
                     inline=False)
 
-        await ctx.reply(embed = em)
+        await ctx.respond(embed = em)
 
 def setup(client):
     client.add_cog(BaseUtils(client))

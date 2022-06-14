@@ -4,6 +4,7 @@ import time
 import discord
 from discord.ext import commands
 from discord.commands import permissions
+from asyncio import sleep
 from dotenv import load_dotenv
 
 from utils import helper_functions
@@ -50,6 +51,7 @@ class ModerationCog(commands.Cog):
             
     @commands.slash_command(name = "warn",
                             description = "Warns an user for something")
+    @discord.default_permissions()
     async def warn(self,
                    ctx: discord.ApplicationContext,
                    user: discord.Option(str,
@@ -60,7 +62,7 @@ class ModerationCog(commands.Cog):
                                           required=True)):
 
         member = ctx.guild.get_member(int(user))
-        
+
         with open("data/moderation_user.json", "r") as f:
             data = json.load(f)
             
@@ -68,14 +70,14 @@ class ModerationCog(commands.Cog):
                 data[user]
             except KeyError:
                 data[user] = {}
-                with open("data/moderation_user.json", "w") as f:
-                    json.dump(data, f, indent=4)
-                with open("data/moderation_user.json", "r") as f:
-                    data = json.load(f)
+                with open("data/moderation_user.json", "w") as a:
+                    json.dump(data, a, indent=4)
+                with open("data/moderation_user.json", "r") as b:
+                    data = json.load(b)
                 data[user]["warnings"] = "0"
                 data[user]["warning_details"] = {}
-                with open("data/moderation_user.json", "w") as f:
-                    json.dump(data, f, indent=4)
+                with open("data/moderation_user.json", "w") as c:
+                    json.dump(data, c, indent=4)
             print("bist du hier?")
             warn_count = data[user]["warnings"]
             warn_count = int(warn_count) + 1
@@ -90,7 +92,7 @@ class ModerationCog(commands.Cog):
             
             key = int(count) + 1
             data[user]["warning_details"][str(key)] = reason
-            
+
         with open("data/moderation_user.json", "w") as f:
             json.dump(data, f, indent=4)
         
@@ -100,5 +102,25 @@ class ModerationCog(commands.Cog):
         await ctx.respond(embed = em)
         await helper_functions.log_channel(client = self.client).send(embed = em.add_field(name="Moderator", value=ctx.author.mention))
 
+    @commands.slash_command(name = "clear",
+                            description = "Clears an given amount of messages from the chat.")
+    @discord.default_permissions()
+    async def clear(self,
+                    ctx: discord.ApplicationContext,
+                    amount: discord.Option(int,
+                                           "Provide a number of messages to clear.",
+                                           required=True)):
+        
+        await ctx.respond("Purging...")
+        await sleep(0.5)
+        purge = await ctx.channel.purge(limit=amount,
+                                reason=f"{ctx.author.name} bulk deleted messages in {ctx.channel.name}")
+
+        em = discord.Embed(title="Purge results",
+                           description=f"Purgend {len(purge)} from targeted {amount}.",
+                           color=discord.Color.darker_gray())
+        await sleep(0.8)
+        await ctx.channel.send(embed=em, delete_after=7.5)
+        
 def setup(client):
     client.add_cog(ModerationCog(client))

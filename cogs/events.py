@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from utils.console_colors import ConsoleColors
 
-logging.getLogger("discord").setLevel(logging.CRITICAL) #Implemented this to prevent py-cord logging module from logging (Credits to Red#6291 from the py-cord discord
+logging.getLogger("discord").setLevel(logging.CRITICAL) #Implemented this to prevent py-cord logging module from logging (Credits to Red#6291 from the py-cord discord)
 logging.basicConfig(filename="data/bot.log",
             filemode="w",
             datefmt="%d-%b-%y %H:%M:%S",

@@ -59,8 +59,10 @@ class FeedbackModal(discord.ui.Modal):
         em.set_author(name = member.name, icon_url = member.display_avatar)
         em.set_footer(text = member.id)
         message = await channel.send(embed = em)
-        await interaction.response.send_message(embed = discord.Embed(title=f"Thanks for submitting your feedback.",
-                                                color = discord.Color.purple()).set_footer(text="Your id was submitted for your identification to inform you about the process."))
+        embed = discord.Embed(title=f"Thanks for submitting your feedback.",
+                                                color = discord.Color.purple())
+        embed.set_footer(text="Your id was submitted to inform you about the process.")
+        await interaction.response.send_message(embed = embed)
         await message.add_reaction("🟢")
         await message.add_reaction("🟡")
         await message.add_reaction("🔴")
