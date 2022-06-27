@@ -1,10 +1,8 @@
-import os
 import time
 import json
 import datetime
 import platform
 
-import utils.buttons
 from utils.buttons import *
 from utils.console_colors import *
 
@@ -14,6 +12,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 load_dotenv()
+started = time.time()
 
 class LoadSelect(discord.ui.Select):
     def __init__(self):
@@ -115,11 +114,10 @@ def options_():
             modules.append(discord.SelectOption(label=str(file.capitalize()[:-3])))
 
     return modules
-
-started = time.time()
-
 def starttime():
     return int(started)
+
+
 
 client = commands.Bot(command_prefix=get_prefix,
                       case_insensitive=True,
@@ -161,6 +159,19 @@ Joined at the following guilds
     #                                                                                         "large_image": "briefcase"
     #                                                                                     }))
 
+@client.event
+async def on_application_command_error(ctx, error):
+    error_em = discord.Embed(title = "Error",
+                             color = discord.Color.red())
+    if isinstance(error, commands.errors.MissingRole):
+        await ctx.delete()
+        error_em.description = f"You are missing the <@&{error.missing_role}> role to run the **{ctx.command.name}** command!"
+        await ctx.send(embed = error_em,
+                       delete_after = 5)
+    else:
+        print(error)
+
+
 @client.slash_command(name = "cogs", description = "Shows wich Cogs are loaded\nLoad, Unload, Reload") #permissions are defined in the view
 async def cogs_cmd(ctx):
     with open("data/cogs.json", "r") as f:
@@ -185,6 +196,8 @@ async def test(ctx):
     test_embed.add_field(name="This is a field", value="with a value", inline=True)
     test_embed.add_field(name = "Inline", value="does this", inline=True)
     await ctx.respond(embeds = [test_embed])
+    
+
     
 if __name__ == '__main__':
     

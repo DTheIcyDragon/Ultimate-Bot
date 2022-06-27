@@ -3,11 +3,10 @@ import os
 import time
 import discord
 from discord.ext import commands
-from discord.commands import permissions
 from asyncio import sleep
 from dotenv import load_dotenv
 
-from utils import helper_functions
+from utils import helper_functions, modals
 
 load_dotenv()
 
@@ -30,9 +29,9 @@ class ModerationCog(commands.Cog):
                            color=discord.Color.magenta())
         em.add_field(name=f"Name", value=f"{member.name}", inline=False)
         em.add_field(name=f"ID", value=f"{member.id}", inline=False)
-        em.add_field(name=f"Joined discord", value=f"<t:{int(created_at)}:F>", inline=False)
-        em.add_field(name="Joined this server", value=f"<t:{int(joined_at)}:F>")
-        em.add_field(name=f"Bot", value=f"{'Yes' if member.bot else 'No'}", inline=False)
+        em.add_field(name=f"Discord Beigetreten", value=f"<t:{int(created_at)}:F>", inline=False)
+        em.add_field(name="Server beigetreten", value=f"<t:{int(joined_at)}:F>")
+        em.add_field(name=f"Bot", value=f"{'Ja' if member.bot else 'Nein'}", inline=False)
         em.set_thumbnail(url=member.display_avatar)
 
         if not ctx.channel.id == int(os.getenv("MODAREA")):
@@ -42,16 +41,20 @@ class ModerationCog(commands.Cog):
             try:
                 with open("data/moderation_user.json", "r") as f:
                     user = json.load(f)
-                warnings = user[str(member.id)]["warnings"]
-                em.add_field(name = "Warnings", value=str(warnings))
+                warnings = user[str(member.id)]["warning_details"]
+                em.add_field(name = "Warunugen", value = "------------------", inline = False)
+                for num, warning in warnings.items():
+                    em.add_field(name = f"{num}. Verwarnung", value=f"{warning}", inline = False)
+                    if len(em.fields) > 24:
+                        break
             except KeyError:
                 em.add_field(name = "Warnings", value="0")
             await ctx.respond(embed = em)
-            
-            
+
+
     @commands.slash_command(name = "warn",
-                            description = "Warns an user for something")
-    @discord.default_permissions()
+                            description = "Warns a member")
+    @helper_functions.is_team()
     async def warn(self,
                    ctx: discord.ApplicationContext,
                    user: discord.Option(str,
@@ -60,7 +63,6 @@ class ModerationCog(commands.Cog):
                    reason: discord.Option(str,
                                           "Please provide a context!",
                                           required=True)):
-
         member = ctx.guild.get_member(int(user))
 
         with open("data/moderation_user.json", "r") as f:
@@ -74,37 +76,49 @@ class ModerationCog(commands.Cog):
                     json.dump(data, a, indent=4)
                 with open("data/moderation_user.json", "r") as b:
                     data = json.load(b)
-                data[user]["warnings"] = "0"
                 data[user]["warning_details"] = {}
                 with open("data/moderation_user.json", "w") as c:
                     json.dump(data, c, indent=4)
-            print("bist du hier?")
-            warn_count = data[user]["warnings"]
-            warn_count = int(warn_count) + 1
-            data[user]["warnings"] = str(warn_count)
-            
             infractions = data[user]["warning_details"]
-            
+
             count = 0
-            
-            for key in infractions.items():
+            for key, _ in infractions.items():
                 count =+ 1
-            
             key = int(count) + 1
             data[user]["warning_details"][str(key)] = reason
 
         with open("data/moderation_user.json", "w") as f:
             json.dump(data, f, indent=4)
-        
+
         em = discord.Embed(title = "Warn",
                            description = f"Warned {member.mention}\nReason: {reason}",
                            color=discord.Color.yellow())
+
         await ctx.respond(embed = em)
         await helper_functions.log_channel(client = self.client).send(embed = em.add_field(name="Moderator", value=ctx.author.mention))
+    
+    @commands.slash_command(name = "kick",
+                            description = "Kicks a member")
+    @helper_functions.is_team()
+    async def kick(self,
+                   ctx: discord.ApplicationContext,
+                   member: discord.Option(str,
+                                          "Please provide a member id to warn!",
+                                          required = True)):
+        
+        member = ctx.guild.get_member(int(member))
+        for role in member.roles:
+            if role.permissions.manage_channels:
+                
+                break
+        modal = modals.KickModal(title = member.name)
+        await ctx.send_modal(modal)
+       
+#        await member.kick(reason = f"Kicked by {ctx.author}")
 
     @commands.slash_command(name = "clear",
                             description = "Clears an given amount of messages from the chat.")
-    @discord.default_permissions()
+    @commands.has_any_role()
     async def clear(self,
                     ctx: discord.ApplicationContext,
                     amount: discord.Option(int,

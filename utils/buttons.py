@@ -62,4 +62,3 @@ class VerificationButtons(discord.ui.View):
             await self.message.delete_original_message()
             await interaction.response.send_message(embed = em, view = self)
             self.stop()
-            

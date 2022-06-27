@@ -1,10 +1,13 @@
 import os
 import discord
 
+from utils.helper_functions import log_channel
+
+
 class FeedbackModal(discord.ui.Modal):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        
+
         title = self.title
         if title == "Application":
             self.add_item(discord.ui.InputText(style=discord.InputTextStyle.short,
@@ -66,3 +69,34 @@ class FeedbackModal(discord.ui.Modal):
         await message.add_reaction("🟢")
         await message.add_reaction("🟡")
         await message.add_reaction("🔴")
+
+class KickModal(discord.ui.Modal):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        title = self.title
+        self.title = f"Kicking {title}"
+
+        self.add_item(discord.ui.InputText(style = discord.InputTextStyle.long,
+                                           label = "Reason",
+                                           placeholder = "Provide a reason"))
+        self.add_item(discord.ui.InputText(style = discord.InputTextStyle.short,
+                                           label = "Bestätigung",
+                                           placeholder = "Schreibe 'Bestätigung'",
+                                           min_length = 11,
+                                           max_length = 11))
+
+    async def callback(self, interaction: discord.Interaction):
+        if self.children[1].value != "Bestätigung":
+            await interaction.response.send_message(embed = discord.Embed(title = "Check failed",
+                                                       description = "You didn't write 'Bestätigung'",
+                                                       color = discord.Color.yellow()))
+            pass
+
+        embed = discord.Embed(title = "Kick",
+                              description = f"""**{self.title[8:]} was kicked by {interaction.user.name}**
+                                                Guild: {interaction.guild.name}
+                                                Grund: {self.children[0].value}""",
+                              color = discord.Color.gold())
+        log = log_channel(interaction.client)
+        await interaction.response.send_message(embed = embed)
+        await log.send(embed = embed)
